@@ -1,0 +1,5 @@
+[project]
+name = "HelmDroid"
+
+[tool.pyside6-project]
+files = ["appsmodel.py", "appsproxymodel.py", "binaryworker.py", "form.ui", "mainwindow.py", "ui_form.py"]
