@@ -174,9 +174,9 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         self.apps_model.set_apps([])
-        self.worker.clear_cache()
         self.worker_thread.quit()
         self.worker_thread.wait()
+        self.worker.clear_cache()
         super().closeEvent(event)
 
 if __name__ == "__main__":
