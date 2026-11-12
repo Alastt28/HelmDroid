@@ -130,27 +130,27 @@ class BinaryWorker(QtCore.QObject):
 
             def bridge_logs(logs_std): 
                 logs = subprocess.run(
-                    ["adb", "logcat", "-d", "-t", "5000", "HelmBridge:D", "*:S"],
+                    ["adb", "logcat", "-d", "-t", "50", "HelmBridge:D", "*:S"],
                     capture_output=True, text=True
                 )
                 return logs_std in logs.stdout
 
             bridge_start = False
-            for log in range(20):
+            for log in range(100):
                 if bridge_logs(f"Session:{session_id}. Start working"):
                     bridge_start = True
                     break
-                time.sleep(0.5)
+                time.sleep(0.1)
 
             if not bridge_start:
                 raise Exception("HelmBridge is not responding. Start fallback")
 
             bridge_stop = False
-            for log in range(120):
+            for log in range(600):
                 if bridge_logs(f"Session:{session_id}. Stop working"):
                     bridge_stop = True
                     break
-                time.sleep(0.5)
+                time.sleep(0.1)
 
             if not bridge_stop:
                 raise Exception("HelmBridge is not responding. Start fallback")
