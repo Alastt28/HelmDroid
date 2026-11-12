@@ -28,11 +28,11 @@ class BinaryWorker(QtCore.QObject):
             self.device_status_changed.emit(self.device_connected_status)
 
     def check_bridge(self):
-        check_installed_brigde = subprocess.run(
+        check_installed_bridge = subprocess.run(
             ["adb", "shell", "pm", "list", "packages", "com.helmdroid.helmbridge"],
             capture_output=True, text=True
         )
-        installed = "com.helmdroid.helmbridge" in check_installed_brigde.stdout
+        installed = "com.helmdroid.helmbridge" in check_installed_bridge.stdout
         self.bridge_check.emit(installed)
 
     def install_bridge(self):
