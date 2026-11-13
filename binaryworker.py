@@ -75,7 +75,7 @@ class BinaryWorker(QtCore.QObject):
                 disabled_apps_list.append(disabled_app)
         return disabled_apps_list
             
-    def load_apps_list_fallback(self):
+    def absolute_solver(self):
         raw_apps_list = subprocess.run(
             ["adb", "shell", "pm", "list", "packages", "-f"],
             capture_output=True, text=True
@@ -186,12 +186,12 @@ class BinaryWorker(QtCore.QObject):
                     })
                 self.apps_list_loaded.emit(self.apps_data_bridge)
             else:
-                self.load_apps_list_fallback()
+                self.absolute_solver()
 
         except Exception as e:      
             if local_zip.exists():
                 local_zip.unlink()
-            self.load_apps_list_fallback()
+            self.absolute_solver()
 
     def ram_button_text(self):
         if self.device_connected_status:

@@ -96,7 +96,7 @@ class MainWindow(QMainWindow):
                 QtCore.QTimer.singleShot(0, self.worker.install_bridge)
             else:
                 self.apps_model.set_apps([])
-                QtCore.QTimer.singleShot(0, self.worker.load_apps_list_fallback)
+                QtCore.QTimer.singleShot(0, self.worker.absolute_solver)
 
     def bridge_install_gui(self, installed: bool):
         if installed:
@@ -107,7 +107,7 @@ class MainWindow(QMainWindow):
                 "Ошибка установки",
                 "Не удалось установить HelmBridge на устройство.\nСписок будет загружен без иконок и названий."
             )
-            QtCore.QTimer.singleShot(0, self.worker.load_apps_list_fallback)        
+            QtCore.QTimer.singleShot(0, self.worker.absolute_solver)        
 
 
     def load_apps_list_gui(self, apps_data: list):
