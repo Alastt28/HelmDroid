@@ -130,7 +130,7 @@ class BinaryWorker(QtCore.QObject):
 
             def bridge_logs(logs_std): 
                 logs = subprocess.run(
-                    ["adb", "logcat", "-d", "-t", "50", "HelmBridge:D", "*:S"],
+                    ["adb", "logcat", "-d", "-t", "500", "HelmBridge:D", "*:S"],
                     capture_output=True, text=True
                 )
                 return logs_std in logs.stdout
