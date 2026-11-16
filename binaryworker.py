@@ -201,27 +201,43 @@ class BinaryWorker(QtCore.QObject):
             )
 
             list_ram_text = raw_ram_text.stdout.splitlines()
-            mem_total_line = ""
-            mem_available_line = ""
+            raw_mem_total_line = ""
+            raw_mem_available_line = ""
+            raw_mem_free_line = ""
+            raw_cached_line = ""
 
-            for mem_lines in list_ram_text:
-                if "MemTotal:" in mem_lines:
-                    mem_total_line = mem_lines
+            for mem_line in list_ram_text:
+                if "MemTotal:" in mem_line:
+                    raw_mem_total_line = mem_line
             
-                if "MemAvailable:" in mem_lines:
-                    mem_available_line = mem_lines
+                if "MemAvailable:" in mem_line:
+                    raw_mem_available_line = mem_line
 
-            mem_total_line_parts = mem_total_line.split()
+                if "MemFree:" in mem_line:
+                    raw_mem_free_line = mem_line
+
+                if mem_line.startswith("Cached:"):
+                    raw_cached_line = mem_line
+
+            mem_total_line_parts = raw_mem_total_line.split()
             mem_total = int(mem_total_line_parts[1])
 
-            mem_available_line_parts = mem_available_line.split()
-            mem_available = int(mem_available_line_parts[1])
+            if raw_mem_available_line:
+                mem_available_line_parts = raw_mem_available_line.split()
+                mem_available = int(mem_available_line_parts[1])
+            else:
+                mem_free_line_parts = raw_mem_free_line.split()
+                mem_free = int(mem_free_line_parts[1])
+                cached_line_parts = raw_cached_line.split()
+                mem_cached = int(cached_line_parts[1])
+                mem_available = mem_free + mem_cached
+
             mem_used = mem_total - mem_available
         
-            mem_total_gb = round(mem_total / (1024 * 1024), 1)
-            mem_used_gb = round(mem_used / (1024 *1024), 1)
+            mem_total_gb = mem_total / (1024 * 1024)
+            mem_used_gb = mem_used / (1024 *1024)
 
-            self.button_text = f"ОЗУ: {mem_used_gb} / {mem_total_gb} ГБ"
+            self.button_text = f"ОЗУ: {mem_used_gb:.2f} / {mem_total_gb:.2f} ГБ"
 
             self.ram_text_updated.emit(self.button_text)
         else:
