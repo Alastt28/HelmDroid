@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.application") version "8.7.3"
-    id("org.jetbrains.kotlin.android") version "2.4.0"
+    id("com.android.application") version "7.4.2"
+    id("org.jetbrains.kotlin.android") version "1.7.22"
 }
 
 repositories {
@@ -10,23 +10,20 @@ repositories {
 
 android {
     namespace = "com.helmdroid.helmbridge"
-    compileSdk = 35
+    compileSdk = 33
 
     compileOptions {
-    	isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 
     defaultConfig {
         applicationId = "com.helmdroid.helmbridge"
-        minSdk = 21
+        minSdk = 8
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -51,7 +48,6 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.4.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.22")
 }
 

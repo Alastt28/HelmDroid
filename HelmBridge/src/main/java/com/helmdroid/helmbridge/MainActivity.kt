@@ -26,7 +26,7 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val baseDir = getExternalFilesDir(null)
+        val baseDir = getExternalFilesDir(null) ?: filesDir
         val zipFile = File(baseDir, "data.zip")
         val sessionId = intent.getStringExtra("session_id") ?: "unknown"
 
@@ -87,7 +87,7 @@ class MainActivity : Activity() {
                     appsJsonArray.put(appObj)
                 }
                 zos.putNextEntry(ZipEntry("apps.json"))
-                zos.write(appsJsonArray.toString(2).toByteArray(Charsets.UTF_8))
+                zos.write(appsJsonArray.toString(2).toByteArray(java.nio.charset.Charset.forName("UTF-8")))
                 zos.closeEntry()
             }
             val totalTime = System.currentTimeMillis() - t0

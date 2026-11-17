@@ -116,6 +116,7 @@ class BinaryWorker(QtCore.QObject):
         self.clear_cache()
 
         remote_zip = "/sdcard/Android/data/com.helmdroid.helmbridge/files/data.zip"
+        remote_zip_fallback = "/data/data/com.helmdroid.helmbridge/files/data.zip"
         local_dir = Path("./cache")
         local_dir.mkdir(parents=True, exist_ok=True)
         local_zip = local_dir / "data.zip"
@@ -155,10 +156,15 @@ class BinaryWorker(QtCore.QObject):
             if not bridge_stop:
                 raise Exception("HelmBridge is not responding. Start fallback")
 
-            subprocess.run(
+            pull_data = subprocess.run(
                 ["adb", "pull", remote_zip, str(local_zip)], 
-                stdout=subprocess.DEVNULL, check=True
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
             )
+            if pull_data.returncode != 0:
+                subprocess.run(
+                    ["adb", "pull", remote_zip_fallback, str(local_zip)], 
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True
+                )
 
             with zipfile.ZipFile(local_zip, 'r') as zip_ref:
                 zip_ref.extractall(local_dir)
