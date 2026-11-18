@@ -38,7 +38,7 @@ class BinaryWorker(QtCore.QObject):
     def install_bridge(self):
         apk_path = Path("bin/HelmBridge.apk").resolve()
         install_apk = subprocess.run(
-            ["adb", "install", "-r", "-g", apk_path],
+            ["adb", "install", "-r", apk_path],
             capture_output=True, text=True
         )
         installed = (install_apk.returncode == 0)
