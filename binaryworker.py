@@ -206,6 +206,9 @@ class BinaryWorker(QtCore.QObject):
                 capture_output=True, text=True
             )
 
+            if raw_ram_text.returncode != 0:
+                return
+
             list_ram_text = raw_ram_text.stdout.splitlines()
             raw_mem_total_line = ""
             raw_mem_available_line = ""
