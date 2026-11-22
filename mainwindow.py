@@ -8,6 +8,12 @@ from appsmodel import AppsModel
 from appsproxymodel import AppsProxyModel
 
 class MainWindow(QMainWindow):
+
+    check_bridge = QtCore.Signal()
+    load_apps_list = QtCore.Signal()
+    install_bridge = QtCore.Signal()
+    absolute_solver = QtCore.Signal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
@@ -23,6 +29,11 @@ class MainWindow(QMainWindow):
         self.worker.ram_text_updated.connect(self.ram_button_text_gui)
         self.worker.bridge_check.connect(self.bridge_check_gui)
         self.worker.bridge_install.connect(self.bridge_install_gui)
+
+        self.check_bridge.connect(self.worker.check_bridge)
+        self.load_apps_list.connect(self.worker.load_apps_list)
+        self.install_bridge.connect(self.worker.install_bridge)
+        self.absolute_solver.connect(self.worker.absolute_solver)
 
         self.apps_model = AppsModel()
         self.ui.apps_list.setModel(self.apps_model)
@@ -73,7 +84,7 @@ class MainWindow(QMainWindow):
 
     def device_status_changed_gui(self, device_connect_status: bool):
         if device_connect_status:
-            QtCore.QTimer.singleShot(0, self.worker.check_bridge)
+            self.check_bridge.emit()
         else:
             self.apps_model.set_apps([])
             self.ui.ram_button.setText("")
@@ -83,7 +94,7 @@ class MainWindow(QMainWindow):
     def bridge_check_gui(self, installed: bool):
         if installed:
             self.apps_model.set_apps([])
-            QtCore.QTimer.singleShot(0, self.worker.load_apps_list)
+            self.load_apps_list.emit()
         else:
             reply = QMessageBox.question(
                 self,
@@ -93,21 +104,21 @@ class MainWindow(QMainWindow):
             )
 
             if reply == QMessageBox.Yes:
-                QtCore.QTimer.singleShot(0, self.worker.install_bridge)
+                self.install_bridge.emit()
             else:
                 self.apps_model.set_apps([])
-                QtCore.QTimer.singleShot(0, self.worker.absolute_solver)
+                self.absolute_solver.emit()
 
     def bridge_install_gui(self, installed: bool):
         if installed:
-            QtCore.QTimer.singleShot(0, self.worker.load_apps_list)
+            self.load_apps_list.emit()
         else:
             QMessageBox.critical(
                 self,
                 "Ошибка установки",
                 "Не удалось установить HelmBridge на устройство.\nСписок будет загружен без иконок и названий."
             )
-            QtCore.QTimer.singleShot(0, self.worker.absolute_solver)        
+            self.absolute_solver.emit()       
 
 
     def load_apps_list_gui(self, apps_data: list):
@@ -173,10 +184,11 @@ class MainWindow(QMainWindow):
             )
 
     def closeEvent(self, event):
-        self.apps_model.set_apps([])
-        self.worker_thread.quit()
+        self.timer.stop()
+        self.worker_thread.terminate()
         self.worker_thread.wait()
         self.worker.clear_cache()
+        self.apps_model.set_apps([])
         super().closeEvent(event)
 
 if __name__ == "__main__":
