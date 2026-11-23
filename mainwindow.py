@@ -1,5 +1,5 @@
 import sys, subprocess, os
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtCore
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtWidgets import QMessageBox
 from ui_form import Ui_MainWindow
