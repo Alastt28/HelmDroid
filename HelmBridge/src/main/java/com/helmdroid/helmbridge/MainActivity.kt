@@ -95,7 +95,7 @@ class MainActivity : Activity() {
         } catch (e: Exception) {
             Log.e("HelmBridge", "Session:$sessionId. Error in main zip process", e)
         }
-        Log.d("HelmBridge", "Session:$sessionId. Stop working")
+        Log.d("HelmBridge", "Session:$sessionId. Stop working. Path:${zipFile.absolutePath}")
         finish()
         android.os.Process.killProcess(android.os.Process.myPid())
     }

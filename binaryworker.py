@@ -115,8 +115,7 @@ class BinaryWorker(QtCore.QObject):
     def load_apps_list(self):
         self.clear_cache()
 
-        remote_zip = "/sdcard/Android/data/com.helmdroid.helmbridge/files/data.zip"
-        remote_zip_fallback = "/data/data/com.helmdroid.helmbridge/files/data.zip"
+        remote_zip = ""
         local_dir = Path("./cache")
         local_dir.mkdir(parents=True, exist_ok=True)
         local_zip = local_dir / "data.zip"
@@ -134,11 +133,15 @@ class BinaryWorker(QtCore.QObject):
                     ["adb", "logcat", "-d", "-t", "500", "HelmBridge:D", "*:S"],
                     capture_output=True, text=True
                 )
-                return logs_std in logs.stdout
+                for line in logs.stdout.splitlines():
+                    if logs_std in line:
+                        return line
+                return ""
 
             bridge_start = False
             for log in range(100):
-                if bridge_logs(f"Session:{session_id}. Start working"):
+                start_line = bridge_logs(f"Session:{session_id}. Start working")
+                if start_line:
                     bridge_start = True
                     break
                 time.sleep(0.1)
@@ -148,7 +151,9 @@ class BinaryWorker(QtCore.QObject):
 
             bridge_stop = False
             for log in range(600):
-                if bridge_logs(f"Session:{session_id}. Stop working"):
+                stop_line = bridge_logs(f"Session:{session_id}. Stop working")
+                if stop_line:
+                    remote_zip = stop_line.split("Path:")[1].strip()
                     bridge_stop = True
                     break
                 time.sleep(0.1)
@@ -156,15 +161,10 @@ class BinaryWorker(QtCore.QObject):
             if not bridge_stop:
                 raise Exception("HelmBridge is not responding. Start fallback")
 
-            pull_data = subprocess.run(
+            subprocess.run(
                 ["adb", "pull", remote_zip, str(local_zip)], 
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True
             )
-            if pull_data.returncode != 0:
-                subprocess.run(
-                    ["adb", "pull", remote_zip_fallback, str(local_zip)], 
-                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True
-                )
 
             with zipfile.ZipFile(local_zip, 'r') as zip_ref:
                 zip_ref.extractall(local_dir)
